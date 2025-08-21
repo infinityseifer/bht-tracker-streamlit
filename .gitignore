@@ -8,9 +8,9 @@ venv/
 .env.*
 
 # Streamlit + caches
-.streamlit/
-.streamlit/secrets.toml
-**/.streamlit/
+#.streamlit/
+#.streamlit/secrets.toml
+#**/.streamlit/
 **/.cache/
 .cache/
 **/.stcache/
