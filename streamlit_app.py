@@ -32,7 +32,7 @@ st.title("🏫 BHT Tracker")
 
 # === 1) Links to Google Apps Script forms ===
 form_dr  = st.secrets.get("form_dr_url",  "https://script.google.com/macros/s/AKfycbxUBFzrOUlgYlwqeVqnTzT072rNFxfsKCJQBZZ7xb8IxRLATl8KyPcIgRlkEVviWawp/exec")
-form_bht = st.secrets.get("form_bht_url", "https://script.google.com/macros/s/AKfycbwRNLUX3Jf4AgVvcd1MHD4v9ibrd8CdAuInfh5qq-3yCoRZadP0IyGCJv8_AaVxUgNA/exec")
+form_bht = st.secrets.get("form_bht_url", "https://script.google.com/macros/s/AKfycbwAq1kgh96AI_Ne1GvoWSHLQq07giFZ2XRCfseK1UDjYGYXtCDJy0oOUVQ2EE52mGdU/exec")
 
 col1, col2 = st.columns(2)
 with col1:
