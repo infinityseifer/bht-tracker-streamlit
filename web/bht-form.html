@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>BHT Referral Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f2f2f2; margin:0; display:flex; min-height:100vh; align-items:center; justify-content:center; }
+    .wrap { background:#fff; max-width:820px; width:100%; padding:28px 32px; border-radius:12px; box-shadow:0 2px 16px rgba(0,0,0,.08); }
+    label { font-weight:600; margin-top:14px; display:block; }
+    input, select, textarea { width:100%; padding:10px; margin-top:6px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; }
+    textarea { min-height:100px; resize:vertical; }
+    button { display:inline-block; margin-top:14px; padding:10px 14px; border:0; border-radius:8px; background:#0b67d3; color:#fff; cursor:pointer; }
+    button.secondary { background:#6b7280; }
+    #preview { display:none; background:#f9fafb; border:1px solid #e5e7eb; padding:16px; border-radius:8px; margin-top:14px; }
+    #preview li { margin:6px 0; }
+    .grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px 16px; }
+    small { color:#6b7280; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>BHT Referral Form</h2>
+
+    <form id="BhtForm">
+      <label>Role</label>
+      <select name="Role" id="Role" required>
+        <option value="">Select...</option>
+        <option>Teacher</option><option>Case Manager</option><option>Counselor</option>
+        <option>Administrator</option><option>Parent</option><option>Social Worker</option>
+        <option>Psychologist</option><option>Speech Pathologist</option>
+        <option>Occupational Therapist</option><option>Network Social Emotional Learning Specialist(NSEL)</option>
+        <option>Diverse Learner Administrator</option>
+      </select>
+
+      <label>Student Last Name</label>
+      <input name="StudentLast" required />
+
+      <label>Student First Name</label>
+      <input name="StudentFirst" required />
+
+      <label>StudentID</label>
+      <input name="StudentID" required />
+
+      <label>Student is...</label>
+      <select name="StudentStatus" required>
+        <option value="">Select...</option>
+        <option>GenED</option><option>IEP</option><option>504</option>
+      </select>
+
+      <label>Teacher/POC (Last, First)</label>
+      <input name="TeacherName" required />
+
+      <label>Teacher/POC Email</label>
+      <input name="TeacherEmail" required />
+
+      <label>Parent/Guardian notified?</label>
+      <select name="ParentNotified" required>
+        <option value="">Select...</option>
+        <option>Yes</option><option>No</option>
+      </select>
+
+      <label>Main concern</label>
+      <select name="MainConcern" required>
+        <option value="">Select...</option>
+        <option>Poor relationships w/ peers and/or adults</option>
+        <option>Aggression (verbal and/or physical)</option>
+        <option>Non-Compliance</option>
+        <option>Sadness/Anxiety/Withdrawal/Grief</option>
+        <option>Substance use/abuse</option>
+        <option>Inattention/Hyperactivity</option>
+        <option>Poor attendance</option>
+        <option>Student reveal personal concern</option>
+      </select>
+
+      <label>Additional concern</label>
+      <select name="AdditionalConcern" required>
+        <option value="">Select...</option>
+        <option>Poor relationships w/ peers and/or adults</option>
+        <option>Aggression (verbal and/or physical)</option>
+        <option>Non-Compliance</option>
+        <option>Sadness/Anxiety/Withdrawal/Grief</option>
+        <option>Substance use/abuse</option>
+        <option>Inattention/Hyperactivity</option>
+        <option>Poor attendance</option>
+        <option>Student reveal personal concern</option>
+      </select>
+
+      <label>Observation</label>
+      <textarea name="Observation" id="Observation" maxlength="5000" placeholder="Describe the observed behavior" required></textarea>
+      <small id="ObservationCounter">0 / 5000</small>
+
+      <label>Student Strength (check all that apply)</label>
+      <div class="grid">
+        <label><input type="checkbox" name="StudentStrength" value="Positive parent/family support"> Positive parent/family support</label>
+        <label><input type="checkbox" name="StudentStrength" value="Athletics"> Athletics</label>
+        <label><input type="checkbox" name="StudentStrength" value="Art"> Art</label>
+        <label><input type="checkbox" name="StudentStrength" value="Connection to Adults"> Connection to Adults</label>
+        <label><input type="checkbox" name="StudentStrength" value="Reading"> Reading</label>
+        <label><input type="checkbox" name="StudentStrength" value="Science"> Science</label>
+        <label><input type="checkbox" name="StudentStrength" value="Peer Relationships"> Peer Relationships</label>
+      </div>
+
+      <label>Tier I (check all that apply)</label>
+      <div class="grid">
+        <label><input type="checkbox" name="TierOne" value="Reinforcement system"> Reinforcement system</label>
+        <label><input type="checkbox" name="TierOne" value="Restorative conversations"> Restorative conversations</label>
+        <label><input type="checkbox" name="TierOne" value="Differentiated instruction"> Differentiated instruction</label>
+        <label><input type="checkbox" name="TierOne" value="Specific praise"> Specific praise</label>
+        <label><input type="checkbox" name="TierOne" value="Mentoring program"> Mentoring program</label>
+        <label><input type="checkbox" name="TierOne" value="Behavior reflection"> Behavior reflection</label>
+        <label><input type="checkbox" name="TierOne" value="None"> None</label>
+      </div>
+
+      <label>Tier II (check all that apply)</label>
+      <div class="grid">
+        <label><input type="checkbox" name="TierTwo" value="Check in/Check out"> Check in/Check out</label>
+        <label><input type="checkbox" name="TierTwo" value="Peace Circle"> Peace Circle</label>
+        <label><input type="checkbox" name="TierTwo" value="Tutoring"> Tutoring</label>
+        <label><input type="checkbox" name="TierTwo" value="Behavior contract"> Behavior contract</label>
+        <label><input type="checkbox" name="TierTwo" value="None"> None</label>
+        <label><input type="checkbox" name="TierTwo" value="Not sure"> Not sure</label>
+      </div>
+
+      <label>Tier III (check all that apply)</label>
+      <div class="grid">
+        <label><input type="checkbox" name="TierThree" value="FBA/BIP (SPED)"> FBA/BIP (SPED)</label>
+        <label><input type="checkbox" name="TierThree" value="Tier III BSP (GenED)"> Tier III BSP (GenED)</label>
+        <label><input type="checkbox" name="TierThree" value="Individual counseling"> Individual counseling</label>
+        <label><input type="checkbox" name="TierThree" value="Other small group intervention"> Other small group intervention</label>
+        <label><input type="checkbox" name="TierThree" value="SAS"> SAS</label> <!-- NEW -->
+        <label><input type="checkbox" name="TierThree" value="None"> None</label>
+        <label><input type="checkbox" name="TierThree" value="Not sure"> Not sure</label>
+      </div>
+
+      <label>FBA / Tier III Plan status</label>
+      <select name="FBA" required>
+        <option value="">Select...</option>
+        <option>Yes: New assessment conducted</option>
+        <option>Yes: Revised existing plan</option>
+        <option>No</option>
+      </select>
+
+      <label>Do you have behavior data?</label>
+      <select name="BehaviorData" required>
+        <option value="">Select...</option>
+        <option>Yes</option><option>No</option>
+      </select>
+
+      <label>Time of day</label>
+      <select name="BehaviorTime" required>
+        <option value="">Select...</option>
+        <option>Before School</option><option>Morning</option><option>Midday</option>
+        <option>Afternoon</option><option>Afterschool</option>
+      </select>
+
+      <label>Subjects / Contexts</label>
+      <select name="BehaviorSubject" required>
+        <option value="">Select...</option>
+        <option>Breakfast</option><option>Morning Meeting/Circle</option><option>Reading</option>
+        <option>Math</option><option>Science</option><option>Social Studies</option>
+        <option>Art</option><option>Language Prep</option><option>P.E.</option>
+        <option>Lunch/Recess</option><option>Independent Work</option>
+        <option>Small Group Work</option><option>Large Group Work</option>
+      </select>
+    </form>
+
+    <button id="previewBtn">Preview Before Submit</button>
+
+    <div id="preview">
+      <h3>Preview</h3>
+      <ul id="previewList"></ul>
+      <button id="confirmBtn">Confirm & Submit</button>
+      <button id="resetBtn" class="secondary">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    // Char count
+    (function () {
+      const el = document.getElementById('Observation');
+      const c  = document.getElementById('ObservationCounter');
+      if (el && c) el.addEventListener('input', () => c.textContent = `${el.value.length} / 5000`);
+    })();
+
+    function getChecked(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+    }
+
+    let payload = null;
+
+    // Preview
+    document.getElementById('previewBtn').addEventListener('click', () => {
+      const form = document.getElementById('BhtForm');
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      // Lists
+      data.StudentStrength = getChecked('StudentStrength');
+      data.TierOne         = getChecked('TierOne');
+      data.TierTwo         = getChecked('TierTwo');
+      data.TierThree       = getChecked('TierThree');
+
+      // DO NOT coerce StudentID (keeps it plain text)
+      payload = data;
+
+      // Render preview
+      const ul = document.getElementById('previewList');
+      ul.innerHTML = '';
+      for (const [k, v] of Object.entries(data)) {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${k}:</strong> ${Array.isArray(v) ? v.join(', ') : v}`;
+        ul.appendChild(li);
+      }
+      document.getElementById('preview').style.display = 'block';
+    });
+
+    // Submit to Apps Script
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+      if (!payload) return;
+      google.script.run
+        .withSuccessHandler(() => {
+          alert('BHT submission saved!');
+          document.getElementById('BhtForm').reset();
+          document.getElementById('preview').style.display = 'none';
+          payload = null;
+        })
+        .withFailureHandler(err => {
+          console.error(err);
+          alert('Error saving to Google Sheets.');
+        })
+        .submitBht(payload);
+    });
+
+    // Reset
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('BhtForm').reset();
+      document.getElementById('preview').style.display = 'none';
+      payload = null;
+    });
+  </script>
+</body>
+</html>

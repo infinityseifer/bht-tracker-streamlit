@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Auto-EDA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .container { max-width: 960px; margin: 24px auto; background:#fff; padding:24px; border-radius:12px; box-shadow:0 0 15px rgba(0,0,0,.06); }
+    .muted { color:#666; font-size:14px; }
+    .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    table { width:100%; border-collapse: collapse; margin: 12px 0; }
+    th, td { border:1px solid #ddd; padding:8px; }
+    th { background:#f6f7fb; text-align:left; }
+    .btn { background:#0066cc; color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer; }
+    .btn:hover { background:#004d99; }
+    .section { margin-top: 24px; }
+    code { background:#f6f7fb; padding:2px 6px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Auto-EDA</h1>
+    <p class="muted">Upload a CSV to generate an instant summary.</p>
+
+    <input type="file" id="csvFile" accept=".csv" />
+    <button id="runEdaBtn" class="btn">Run EDA</button>
+
+    <div id="status" class="muted section"></div>
+
+    <div id="report" class="section" style="display:none;">
+      <h2>Dataset Overview</h2>
+      <div id="overview"></div>
+
+      <h2>Columns</h2>
+      <div id="columns"></div>
+
+      <h2>Missing Values</h2>
+      <div id="missing"></div>
+
+      <h2>Numeric Summary</h2>
+      <div id="numeric"></div>
+
+      <h2>Top Categories</h2>
+      <div id="categorical"></div>
+
+      <h2>Correlations (Pearson)</h2>
+      <div id="corr"></div>
+    </div>
+  </div>
+
+  <script src="eda.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <a class="btn primary" href="/analytics" target="_blank" rel="noopener">Open Analytics (Streamlit)</a>
+
+  <title>Admin Dashboard – BHT Tracker</title>
+
+  <style>
+    :root {
+      --bg:#f2f5f9; --card:#fff; --text:#1f2937; --muted:#6b7280;
+      --primary:#0a66c2; --primary-dark:#084f98; --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:1100px;margin:40px auto;padding:0 16px}
+    .header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+    .header h1{font-size:24px;margin:0;font-weight:700}
+    .sub{color:var(--muted);margin:0 0 18px 0;font-size:14px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 18px}
+    .btn{background:var(--card);color:var(--text);border:1px solid var(--border);padding:10px 14px;font-size:14px;border-radius:10px;cursor:pointer;transition:all .15s}
+    .btn:hover{border-color:var(--primary)}
+    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .btn.primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+    .btn.active{outline:2px solid var(--primary);outline-offset:1px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .iframe-wrap{position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;min-height:320px}
+    iframe{width:100%;height:clamp(500px,70vh,900px);border:0;display:block}
+    .spinner{position:absolute;inset:0;display:none;place-items:center;background:rgba(255,255,255,.8);backdrop-filter:blur(1px);z-index:2}
+    .spinner .dot{width:12px;height:12px;margin:0 4px;border-radius:50%;background:var(--primary);animation:pulse .9s infinite ease-in-out}
+    .spinner .dot:nth-child(2){animation-delay:.15s}
+    .spinner .dot:nth-child(3){animation-delay:.3s}
+    /* Replace your current keyframes block with this */
+@keyframes pulse {
+  0%, 80%, 100% { 
+    opacity: .2; 
+    transform: scale(.9); 
+  }
+  40% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+    .note{font-size:12px;color:var(--muted);margin-top:10px}
+    .back{text-decoration:none;color:var(--primary);font-weight:600;font-size:14px}
+    .back:hover{color:var(--primary-dark)}
+    .hidden{display:none !important}
+
+    /* EDA panel */
+    .eda-wrap{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff}
+    .drop{border:2px dashed var(--border);border-radius:12px;background:#fafafa;padding:20px;text-align:center;color:var(--muted);transition:border-color .15s, background .15s}
+    .drop.drag{border-color:var(--primary);background:#f0f7ff}
+    .drop input{display:none}
+    .eda-actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid var(--border);padding:8px;font-size:14px}
+    th{background:#f8fafc;text-align:left}
+    .scroll-x{overflow:auto}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Admin Dashboard</h1>
+      <a class="back" href="index.html">← Back to Home</a>
+    </div>
+    <p class="sub">View live submissions and run quick EDA on CSVs.</p>
+
+    <div class="toolbar">
+      <button id="btn-dr"  class="btn">DR Submissions</button>
+      <button id="btn-bht" class="btn">BHT Submissions</button>
+      <button id="btn-eda" class="btn">EDA (Upload CSV)</button>
+      <button id="btn-refresh" class="btn">Refresh View</button>
+      <a id="btn-open" class="btn primary" target="_blank" rel="noopener">Open in New Tab</a>
+    </div>
+
+    <div class="card">
+      <!-- Sheets/Looker iframe -->
+      <div class="iframe-wrap" id="sheetEmbed">
+        <div class="spinner" id="spinner">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <iframe id="frame" title="Embedded content"></iframe>
+      </div>
+
+      <!-- EDA panel -->
+      <div id="edaPanel" class="eda-wrap hidden">
+        <div class="drop" id="edaDrop">
+          <p><strong>Drop your CSV here</strong> or <label for="edaFile" style="color:var(--primary);cursor:pointer;">browse</label>.</p>
+          <input type="file" id="edaFile" accept=".csv,text/csv" />
+          <small class="note">We parse the file in your browser & generate an instant summary.</small>
+        </div>
+        <div class="eda-actions">
+          <button id="btn-download-report" class="btn">Download HTML Report</button>
+          <span id="edaMeta" class="note"></span>
+        </div>
+        <div id="edaSummary" class="scroll-x"></div>
+        <div id="edaPreview" class="scroll-x" style="margin-top:12px"></div>
+      </div>
+
+      <p class="note">
+        If you see “This document is not published”, open the source and use <em>File → Share → Publish to the web</em> (Sheets),
+        or <em>Share → Embed report</em> (Looker Studio). Consider embedding a sanitized view without PII.
+      </p>
+    </div>
+  </div>
+
+  <!-- PapaParse for CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Admin logic -->
+  <script src="admin.js"></script>
+
+  <script>
+    /* Set your published embed URLs here */
+    window.ADMIN_EMBEDS = {
+      DR:  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSvoak7lmaqHWnftfd3FhOwmUAOOt5WRvkP3YJ-7eHfy7eCcAgor-pINPiq7Pe2pKnlEQUf6FkPLQiA/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false",
+      BHT: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCrBURgsVyJA7tudsLySxHU9jCdtek28ha2B344Xhp7Y-HeYuOK2FH1WGvhh76GHQguNmfTPEZ950p/pubhtml?widget=true&amp;headers=false",
+      EDA: null /* leave null to use the built-in EDA panel */
+    };
+  </script>
+</body>
+</html>

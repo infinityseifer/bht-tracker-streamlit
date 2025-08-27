@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Discipline Referral Form</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <style>
+    body {
+      margin: 0; padding: 0; font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh;
+    }
+ 
+    .form-wrapper {
+      background-color: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 100%; max-width: 600px;
+    }
+
+    h1 { text-align: center; margin-bottom: 20px; }
+    label { font-weight: bold; margin-top: 15px; display: block; }
+    input, select, textarea {
+      width: 100%; padding: 10px;
+      margin-top: 4px; margin-bottom: 16px;
+      border-radius: 6px; border: 1px solid #ccc;
+      font-size: 15px; box-sizing: border-box;
+    }
+
+    textarea { resize: vertical; min-height: 100px; }
+    button {
+      width: 100%; background-color: #0066cc; color: white;
+      border: none; padding: 12px; font-size: 16px;
+      border-radius: 8px; cursor: pointer;
+    }
+    button:hover { background-color: #004d99; }
+
+    small { font-size: 12px; color: #666; }
+
+    #previewSection {
+      border: 1px solid #ccc;
+      padding: 24px;
+      margin-top: 24px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+    }
+    #previewSection h3 {
+      margin-top: 0; font-size: 20px; color: #333;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 8px; margin-bottom: 16px;
+    }
+    #previewSection ul {
+      list-style: none; padding-left: 0; margin-bottom: 16px;
+    }
+    #previewSection li {
+      display: flex; flex-wrap: wrap;
+      margin-bottom: 12px; font-size: 15px; line-height: 1.6;
+    }
+    #previewSection strong {
+      width: 200px; color: #004080;
+    }
+    .preview-buttons {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-wrapper">
+    <h1>Discipline Referral Form</h1>
+
+    <form id="DrForm" 
+          action="https://script.google.com/macros/s/AKfycbxHxmIkTqE8_GV3PRcEl0cyyI1N3XtR2Fys530i1ZEbWAh0qXM0W04yeCV4q64sCL0u/exec"
+          method="POST"
+          target="dr_hidden_iframe">
+
+      <!-- Form Fields -->
+      <label for="StudentLast">Student Last Name</label>
+      <input type="text" name="StudentLast" id="StudentLast" required />
+
+      <label for="StudentFirst">Student First Name</label>
+      <input type="text" name="StudentFirst" id="StudentFirst" required />
+
+      <label for="Grade">Grade</label>
+      <select id="Grade" name="Grade" required>
+        <option value="">Select...</option>
+        <option>0</option><option>1</option><option>2</option><option>3</option>
+        <option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+      </select>
+
+      <label for="DateTime">Date/Time</label>
+      <input name="DateTime" id="DateTime" type="datetime-local" required />
+
+      <label for="HomeroomTeacher">Homeroom Teacher</label>
+      <input name="HomeroomTeacher" id="HomeroomTeacher" placeholder="Homeroom Teacher" />
+
+      <label for="TeacherIntervention">Teacher Intervention</label>
+      <select id="TeacherIntervention" name="TeacherIntervention">
+        <option value="">Select...</option>
+        <option>Parent Contact by Teacher</option>
+        <option>Reflection Time</option>
+        <option>Loss of Privilege</option>
+        <option>Student Warning</option>
+        <option>Parent/Teacher Conference</option>
+        <option>Individual Behavior Plan</option>
+        <option>Counselor Referral</option>
+        <option>Resorative Conversation</option>
+      </select>
+
+      <label for="ProactiveConcern">Proactive Concern</label>
+      <select id="ProactiveConcern" name="ProactiveConcern">
+        <option value="">Select...</option>
+        <option>Attendance</option><option>Homework</option>
+        <option>Classwork</option><option>Time on Task/Sleeping in Class</option><option>Hygiene</option>
+      </select>
+
+      <label for="Narrative">Narrative (max 2500 characters)</label>
+      <textarea id="Narrative" name="Narrative" maxlength="2500" placeholder="Describe the incident or behavior"></textarea>
+      <small id="narrativeCounter">0 / 2500</small>
+
+      <label for="MinorProblemBehavior">Minor Problem Behavior</label>
+      <select id="MinorProblemBehavior" name="MinorProblemBehavior">
+        <option value="">Select...</option>
+        <option>Abusive Language</option>
+        <option>Disrespect/Defiance</option>
+        <option>Disruption</option>
+        <option>Unauthorized use of CPS Network</option>
+        <option>Physical Contact-Non Injury</option>
+        <option>Leaving class without permission</option>
+        <option>Unauthorized use of technology</option>
+      </select>
+
+      <label for="MajorProblemBehavior">Major Problem Behavior</label>
+      <select id="MajorProblemBehavior" name="MajorProblemBehavior">
+        <option value="">Select...</option>
+        <option>Physical Contact - Injury</option>
+        <option>Theft</option>
+        <option>Vandalism/Property Damage</option>
+        <option>Bullying/Harassment</option>
+        <option>Title 9/OSP</option>
+      </select>
+
+      <label for="NextSteps">Action Taken/Next Steps</label>
+      <select id="NextSteps" name="NextSteps">
+        <option value="">Select...</option>
+        <option>Teacher-Parent-Student Conference</option>
+        <option>Restorative Conversation</option>
+        <option>Counselor</option>
+        <option>Loss of Privilege</option>
+        <option>Reflect/Restore/Repair Time</option>
+        <option>In-School Suspension</option>
+        <option>Reflective Lunch/Recess</option>
+        <option>Out-of-School Suspension</option>
+        <option>Peace Circle</option>
+      </select>
+
+      <label for="SELCompetency">SEL/ATL Competencies</label>
+      <select id="SELCompetency" name="SELCompetency">
+        <option value="">Select...</option>
+        <option>Self-Awareness</option>
+        <option>Self-Management</option>
+        <option>Relationship Skills</option>
+        <option>Social Awareness</option>
+      </select>
+    </form>
+
+    <iframe name="dr_hidden_iframe" style="display:none;"></iframe>
+
+    <!-- Preview and Action Buttons -->
+    <div class="preview-buttons">
+      <button type="button" id="previewBtn">Preview Before Submit</button>
+    </div>
+
+    <div id="previewSection" style="display: none;">
+      <h3>Preview Submission</h3>
+      <pre id="previewContent" style="white-space: pre-wrap;"></pre>
+      <div class="preview-buttons">
+        <button id="confirmSubmitBtn">Confirm & Submit</button>
+        <button id="savePdfBtn">Save Preview as PDF</button>
+        <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+      </div>
+    </div>
+
+    <p id="statusMessage"></p>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="DrForm.js"></script>
+  <script src="form-enhance.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</body>
+</html>
