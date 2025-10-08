@@ -134,6 +134,10 @@ if _dt_col:
     df["_dt"] = pd.to_datetime(df[_dt_col], errors="coerce")
 else:
     df["_dt"] = pd.NaT
+    
+df["_name"] = (df["StudentLast"].astype("string").str.strip() + ", " +
+               df["StudentFirst"].astype("string").str.strip())
+
 
 # --------- Sidebar filters (NO DATE FILTER) ----------
 with st.sidebar:
@@ -158,6 +162,14 @@ if _teacher_col and staff_sel:
     fdf = fdf[fdf[_teacher_col].isin(staff_sel)]
 
 # --------- Helpers ----------
+def _col(df_in, candidates):
+    """Return the first existing column from a list of candidate names, else None."""
+    for c in candidates:
+        if c in df_in.columns:
+            return c
+    return None
+
+
 def _vc(df_in, col, top=15, split_multi=False):
     if col not in df_in.columns:
         return pd.DataFrame(columns=["value","n"])
@@ -317,7 +329,9 @@ _major_col = next((c for c in ["MajorProblemBehavior","Major Problem","MajorBeha
 _sel_col = next((c for c in ["SELCompetency","SEL Competency","SEL Area","SEL Domain"] if c in df.columns), None)
 
 # ============================== LAYOUT (tabs) ==============================
-tab_overview, tab_analytics, tab_flags, tab_raw = st.tabs(["Overview", "Analytics", "Flags", "Raw Data"])
+tab_overview, tab_analytics, tab_narrative, tab_flags, tab_raw = st.tabs(
+    ["Overview", "Analytics", "Narrative", "Flags", "Raw Data"]
+)
 
 with tab_overview:
     st.subheader("At a glance")
@@ -392,6 +406,127 @@ with tab_analytics:
         ch = _bar(vc, "Interventions used", "Intervention")
         if ch: st.altair_chart(ch, use_container_width=True)
         else:  st.caption("No interventions recorded.")
+        
+with tab_narrative:
+    st.subheader("🧾 Student Narrative")
+
+    # Column picks we’ll reuse
+    
+    # Prefer Homeroom Teacher; fall back to other likely columns
+    teacher_col = _col(df, [
+        "Homeroom Teacher", "HomeroomTeacher", "HRTeacher",
+        "Teacher/POC", "POC", "TeacherName", "Teacher", "Staff", "Referrer"
+    ])
+
+    main_col     = _col(df, ["IncidentType","MainConcern","Behavior","ProactiveConcern","ProblemBehavior"])
+    addl_col     = _col(df, ["AdditionalConcern","SecondaryConcern"])
+    location_col = _col(df, ["Location","Setting","BehaviorSubject"])
+    # Observation / free text possibilities
+    note_col     = _col(df, ["Observation","Notes","Description","Narrative","Details"])
+    # Interventions (single combined) or tiered
+    interv_col   = _col(df, ["ClassroomInterventions","TeacherIntervention","Interventions"])
+    tier1_col    = _col(df, ["TierOne","Tier 1","Tier I"])
+    tier2_col    = _col(df, ["TierTwo","Tier 2","Tier II"])
+    tier3_col    = _col(df, ["TierThree","Tier 3","Tier III"])
+
+    # Student picker
+    student_list = sorted([n for n in df["_name"].dropna().unique() if n and n != ", "])
+    if not student_list:
+        st.info("No student names found.")
+        st.stop()
+
+    student = st.selectbox("Choose a student", student_list, index=0, key="narr_student")
+
+    # Filter to that student & sort by datetime if present
+    sdf = df[df["_name"] == student].copy()
+    sdf = sdf.sort_values("_dt") if "_dt" in sdf.columns else sdf
+
+    # Quick search within this student's entries
+    q = st.text_input("Search this student's entries (optional)")
+    if q:
+        qlow = q.lower()
+        # Build a combined text column to search
+        search_cols = [c for c in [note_col, main_col, addl_col, location_col, teacher_col, interv_col,
+                                   tier1_col, tier2_col, tier3_col] if c]
+        if search_cols:
+            sdf = sdf[sdf[search_cols].astype(str).apply(lambda row: qlow in (" | ".join(row)).lower(), axis=1)]
+
+    if sdf.empty:
+        st.caption("No matching entries for this student.")
+        st.stop()
+
+    # Render as a simple timeline
+    st.markdown(f"**Entries for:** {student}  &nbsp;&nbsp; _(total {len(sdf)})_")
+    st.divider()
+
+    parts = []
+    for _, r in sdf.iterrows():
+        dt_str = ""
+        if "_dt" in r and pd.notna(r["_dt"]):
+            try:
+                dt_str = pd.to_datetime(r["_dt"]).strftime("%Y-%m-%d %H:%M")
+            except Exception:
+                dt_str = str(r.get("_dt", "")) or ""
+
+        # Collect fields for display
+        teacher = str(r.get(teacher_col, "")) if teacher_col else ""
+        main    = str(r.get(main_col, "")) if main_col else ""
+        addl    = str(r.get(addl_col, "")) if addl_col else ""
+        loc     = str(r.get(location_col, "")) if location_col else ""
+        note    = str(r.get(note_col, "")) if note_col else ""
+
+        # Interventions summary (prefer combined; else join tiers)
+        interv = ""
+        if interv_col:
+            interv = str(r.get(interv_col, "")) or ""
+        else:
+            tiers = [str(r.get(tier1_col,"") or ""), str(r.get(tier2_col,"") or ""), str(r.get(tier3_col,"") or "")]
+            tiers = [t for t in tiers if t]
+            interv = "; ".join(tiers)
+
+        # Pretty card
+        st.markdown(
+            f"""
+<div style="border-left:4px solid #e5e7eb; padding:8px 12px; margin:8px 0;">
+  <div style="font-weight:600;">{dt_str or "—"}</div>
+    <div style="color:#4b5563; margin-top:2px;">
+      <b>Homeroom teacher:</b> {teacher or "—"} &nbsp;&nbsp;
+      <b>Location:</b> {loc or "—"}
+    </div>
+
+  <div style="margin-top:6px;">
+    <b>Main concern:</b> {main or "—"}<br/>
+    {"<b>Additional:</b> " + addl if addl else ""}
+  </div>
+  <div style="margin-top:6px;">
+    <b>Interventions:</b> {interv or "—"}
+  </div>
+  {"<div style='margin-top:6px; white-space:pre-wrap;'><b>Observation:</b> " + (note or "—") + "</div>" if note_col else ""}
+</div>
+""",
+            unsafe_allow_html=True
+        )
+
+        # For downloadable narrative text
+        line = []
+        if dt_str: line.append(f"[{dt_str}]")
+        if teacher: line.append(f"Staff: {teacher}")
+        if loc: line.append(f"Location: {loc}")
+        if main: line.append(f"Main: {main}")
+        if addl: line.append(f"Additional: {addl}")
+        if interv: line.append(f"Interventions: {interv}")
+        if note: line.append(f"Observation: {note}")
+        parts.append(" | ".join(line))
+
+    # Download compiled narrative
+    compiled = ("\n".join(parts)).encode("utf-8")
+    st.download_button(
+        "Download narrative (.txt)",
+        data=compiled,
+        file_name=f"{student.replace(',','').replace(' ','_')}_narrative.txt",
+        mime="text/plain"
+    )
+
 
 with tab_flags:
     st.subheader("🚩 Students flagged")
