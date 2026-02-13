@@ -42,13 +42,8 @@ window.addEventListener('load', () => {
 st.title("🏫 BHT Tracker")
 
 # === 1) Links to Google Apps Script forms ===
-<<<<<<< HEAD
 form_dr  = st.secrets.get("form_dr_url",  "https://script.google.com/macros/s/AKfycbxUBFzrOUlgYlwqeVqnTzT072rNFxfsKCJQBZZ7xb8IxRLATl8KyPcIgRlkEVviWawp/exec")
 form_bht = st.secrets.get("form_bht_url", "https://script.google.com/macros/s/AKfycbxcQWju7zho6BOb710bIKqxsD_1tZ7mnFvRJ-YLLrSkGzaD54WbbZgCsnoEzQ-8dMKE/exec")
-=======
-# form_dr  = st.secrets.get("form_dr_url",  "https://script.google.com/macros/s/AKfycbxUBFzrOUlgYlwqeVqnTzT072rNFxfsKCJQBZZ7xb8IxRLATl8KyPcIgRlkEVviWawp/exec")
-# form_bht = st.secrets.get("form_bht_url", "https://script.google.com/macros/s/AKfycbxcQWju7zho6BOb710bIKqxsD_1tZ7mnFvRJ-YLLrSkGzaD54WbbZgCsnoEzQ-8dMKE/exec")
->>>>>>> 448b66dc94e5d882fb1ca5ae1d07e2b6869857c8
 
 col1, col2 = st.columns(2)
 with col1:
