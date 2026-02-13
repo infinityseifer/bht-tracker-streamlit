@@ -4,6 +4,16 @@ import requests
 import pandas as pd
 import streamlit as st
 
+import streamlit as st
+
+def get_secret(key: str, default=None):
+    # Safe accessor that won’t crash if secrets.toml doesn’t exist
+    try:
+        return st.secrets.get(key, default)
+    except Exception:
+        return default
+
+
 st.set_page_config(page_title="Incidents Table", layout="wide")
 st.title("📋 Incidents Table")
 

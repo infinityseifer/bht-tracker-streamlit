@@ -2,7 +2,13 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>BHT Referral Form</title>
+  <title>Kershaw IB World School BHT Referral Form</title>
+  
+
+  <!-- Choices.js (pretty multi-selects) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
   <style>
     body { font-family: Arial, sans-serif; background:#f2f2f2; margin:0; display:flex; min-height:100vh; align-items:center; justify-content:center; }
     .wrap { background:#fff; max-width:820px; width:100%; padding:28px 32px; border-radius:12px; box-shadow:0 2px 16px rgba(0,0,0,.08); }
@@ -13,15 +19,19 @@
     button.secondary { background:#6b7280; }
     #preview { display:none; background:#f9fafb; border:1px solid #e5e7eb; padding:16px; border-radius:8px; margin-top:14px; }
     #preview li { margin:6px 0; }
-    .grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px 16px; }
     small { color:#6b7280; }
+
+    /* Choices tweaks */
+    .choices__inner{ border-radius:8px; border-color:#ccc; padding:6px 8px; }
+    .choices__list--multiple .choices__item{ background:#eef2ff; border:1px solid #c7d2fe; color:#1e40af; }
+    .muted { color:#6b7280; font-size:12px; margin-top:4px; display:block; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h2>BHT Referral Form</h2>
 
-    <form id="BhtForm">
+    <form id="BhtForm" autocomplete="off">
       <label>Role</label>
       <select name="Role" id="Role" required>
         <option value="">Select...</option>
@@ -29,7 +39,7 @@
         <option>Administrator</option><option>Parent</option><option>Social Worker</option>
         <option>Psychologist</option><option>Speech Pathologist</option>
         <option>Occupational Therapist</option><option>Network Social Emotional Learning Specialist(NSEL)</option>
-        <option>Diverse Learner Administrator</option>
+        <option>Diverse Learner Administrator</option><option>Youth Intervention Specialist</option>
       </select>
 
       <label>Student Last Name</label>
@@ -51,7 +61,7 @@
       <input name="TeacherName" required />
 
       <label>Teacher/POC Email</label>
-      <input name="TeacherEmail" required />
+      <input name="TeacherEmail" type="email" required />
 
       <label>Parent/Guardian notified?</label>
       <select name="ParentNotified" required>
@@ -89,48 +99,20 @@
       <textarea name="Observation" id="Observation" maxlength="5000" placeholder="Describe the observed behavior" required></textarea>
       <small id="ObservationCounter">0 / 5000</small>
 
-      <label>Student Strength (check all that apply)</label>
-      <div class="grid">
-        <label><input type="checkbox" name="StudentStrength" value="Positive parent/family support"> Positive parent/family support</label>
-        <label><input type="checkbox" name="StudentStrength" value="Athletics"> Athletics</label>
-        <label><input type="checkbox" name="StudentStrength" value="Art"> Art</label>
-        <label><input type="checkbox" name="StudentStrength" value="Connection to Adults"> Connection to Adults</label>
-        <label><input type="checkbox" name="StudentStrength" value="Reading"> Reading</label>
-        <label><input type="checkbox" name="StudentStrength" value="Science"> Science</label>
-        <label><input type="checkbox" name="StudentStrength" value="Peer Relationships"> Peer Relationships</label>
-      </div>
+      <!-- ✅ DROPDOWNS (multi-select) replacing checkboxes -->
+      <label>Student Strength (pick all that apply)</label>
+      <select id="StudentStrength" multiple></select>
+      <span class="muted">You can search and pick multiple.</span>
 
-      <label>Tier I (check all that apply)</label>
-      <div class="grid">
-        <label><input type="checkbox" name="TierOne" value="Reinforcement system"> Reinforcement system</label>
-        <label><input type="checkbox" name="TierOne" value="Restorative conversations"> Restorative conversations</label>
-        <label><input type="checkbox" name="TierOne" value="Differentiated instruction"> Differentiated instruction</label>
-        <label><input type="checkbox" name="TierOne" value="Specific praise"> Specific praise</label>
-        <label><input type="checkbox" name="TierOne" value="Mentoring program"> Mentoring program</label>
-        <label><input type="checkbox" name="TierOne" value="Behavior reflection"> Behavior reflection</label>
-        <label><input type="checkbox" name="TierOne" value="None"> None</label>
-      </div>
+      <label>Tier I (pick all that apply)</label>
+      <select id="TierOne" multiple></select>
 
-      <label>Tier II (check all that apply)</label>
-      <div class="grid">
-        <label><input type="checkbox" name="TierTwo" value="Check in/Check out"> Check in/Check out</label>
-        <label><input type="checkbox" name="TierTwo" value="Peace Circle"> Peace Circle</label>
-        <label><input type="checkbox" name="TierTwo" value="Tutoring"> Tutoring</label>
-        <label><input type="checkbox" name="TierTwo" value="Behavior contract"> Behavior contract</label>
-        <label><input type="checkbox" name="TierTwo" value="None"> None</label>
-        <label><input type="checkbox" name="TierTwo" value="Not sure"> Not sure</label>
-      </div>
+      <label>Tier II (pick all that apply)</label>
+      <select id="TierTwo" multiple></select>
 
-      <label>Tier III (check all that apply)</label>
-      <div class="grid">
-        <label><input type="checkbox" name="TierThree" value="FBA/BIP (SPED)"> FBA/BIP (SPED)</label>
-        <label><input type="checkbox" name="TierThree" value="Tier III BSP (GenED)"> Tier III BSP (GenED)</label>
-        <label><input type="checkbox" name="TierThree" value="Individual counseling"> Individual counseling</label>
-        <label><input type="checkbox" name="TierThree" value="Other small group intervention"> Other small group intervention</label>
-        <label><input type="checkbox" name="TierThree" value="SAS"> SAS</label> <!-- NEW -->
-        <label><input type="checkbox" name="TierThree" value="None"> None</label>
-        <label><input type="checkbox" name="TierThree" value="Not sure"> Not sure</label>
-      </div>
+      <label>Tier III (pick all that apply)</label>
+      <select id="TierThree" multiple></select>
+      <span class="muted">Includes “SAS”.</span>
 
       <label>FBA / Tier III Plan status</label>
       <select name="FBA" required>
@@ -161,6 +143,7 @@
         <option>Art</option><option>Language Prep</option><option>P.E.</option>
         <option>Lunch/Recess</option><option>Independent Work</option>
         <option>Small Group Work</option><option>Large Group Work</option>
+        <option>Transitioning</option><option>Dismissal</option>
       </select>
     </form>
 
@@ -175,15 +158,49 @@
   </div>
 
   <script>
-    // Char count
-    (function () {
+    // Character counter
+    (() => {
       const el = document.getElementById('Observation');
       const c  = document.getElementById('ObservationCounter');
       if (el && c) el.addEventListener('input', () => c.textContent = `${el.value.length} / 5000`);
     })();
 
-    function getChecked(name) {
-      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+    // Build Choices multi-selects with options
+    const choices = {};
+    function makeChoices(id, items){
+      const el = document.getElementById(id);
+      // seed native <option>s for accessibility / fallback
+      items.forEach(v => el.add(new Option(v, v)));
+      choices[id] = new Choices(el, {
+        removeItemButton: true,
+        searchEnabled: true,
+        placeholderValue: 'Select…',
+        itemSelectText: '',
+        shouldSort: false,
+        allowHTML: false
+      });
+    }
+
+    // Options for each dropdown (edit to taste)
+    makeChoices('StudentStrength', [
+      'Positive parent/family support','Athletics','Art','Connection to Adults',
+      'Reading','Science','Peer Relationships'
+    ]);
+    makeChoices('TierOne', [
+      'Reinforcement system','Restorative conversations','Differentiated instruction',
+      'Specific praise','Mentoring program','Behavior reflection','None'
+    ]);
+    makeChoices('TierTwo', [
+      'Check in/Check out','Peace Circle','Tutoring','Behavior contract','None','Not sure'
+    ]);
+    makeChoices('TierThree', [
+      'FBA/BIP (SPED)','Tier III BSP (GenED)','Individual counseling',
+      'Other small group intervention','SAS','None','Not sure'
+    ]);
+
+    // Helpers
+    function getMulti(id){
+      return choices[id] ? choices[id].getValue(true) : [];
     }
 
     let payload = null;
@@ -193,16 +210,15 @@
       const form = document.getElementById('BhtForm');
       const data = Object.fromEntries(new FormData(form).entries());
 
-      // Lists
-      data.StudentStrength = getChecked('StudentStrength');
-      data.TierOne         = getChecked('TierOne');
-      data.TierTwo         = getChecked('TierTwo');
-      data.TierThree       = getChecked('TierThree');
+      // Capture multi-selects
+      data.StudentStrength = getMulti('StudentStrength');
+      data.TierOne         = getMulti('TierOne');
+      data.TierTwo         = getMulti('TierTwo');
+      data.TierThree       = getMulti('TierThree');
 
-      // DO NOT coerce StudentID (keeps it plain text)
       payload = data;
 
-      // Render preview
+      // Render preview list
       const ul = document.getElementById('previewList');
       ul.innerHTML = '';
       for (const [k, v] of Object.entries(data)) {
@@ -213,13 +229,14 @@
       document.getElementById('preview').style.display = 'block';
     });
 
-    // Submit to Apps Script
+    // Submit to Apps Script (ensure server has function `submitBht`)
     document.getElementById('confirmBtn').addEventListener('click', () => {
       if (!payload) return;
       google.script.run
         .withSuccessHandler(() => {
           alert('BHT submission saved!');
           document.getElementById('BhtForm').reset();
+          Object.values(choices).forEach(c => c.removeActiveItems());
           document.getElementById('preview').style.display = 'none';
           payload = null;
         })
@@ -233,6 +250,7 @@
     // Reset
     document.getElementById('resetBtn').addEventListener('click', () => {
       document.getElementById('BhtForm').reset();
+      Object.values(choices).forEach(c => c.removeActiveItems());
       document.getElementById('preview').style.display = 'none';
       payload = null;
     });

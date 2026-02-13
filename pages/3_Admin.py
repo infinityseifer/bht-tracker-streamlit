@@ -10,43 +10,17 @@ import altair as alt
 # ---------------- UI polish ----------------
 st.markdown("""
 <style>
-/* Slimmer page padding */
 .block-container { padding-top: 1rem; padding-bottom: 2rem; }
-
-/* No header gradient */
 [data-testid="stHeader"] { background: none !important; }
-
-/* Make metrics flat (no white cards) */
-div[data-testid="stMetric"]{
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
-
-/* Flat radio “pills” */
+div[data-testid="stMetric"]{ border: none !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
 div[role="radiogroup"] > label{
-  border: 1px solid rgba(49,51,63,.10) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-radius: 999px !important;
-  padding: .25rem .75rem !important;
-  margin-right: .35rem !important;
-  margin-bottom: .35rem !important;
+  border: 1px solid rgba(49,51,63,.10) !important; background: transparent !important; box-shadow: none !important;
+  border-radius: 999px !important; padding: .25rem .75rem !important; margin-right: .35rem !important; margin-bottom: .35rem !important;
 }
-
-/* Dataframe/table container: remove card look */
-[data-testid="stDataFrame"] div[role="table"]{
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-/* Keep everything transparent */
+[data-testid="stDataFrame"] div[role="table"]{ border: none !important; box-shadow: none !important; border-radius: 0 !important; }
 main, section.main, .block-container { background: transparent !important; }
 </style>
 """, unsafe_allow_html=True)
-
 
 st.title("⚙️ Admin / EDA")
 
@@ -66,18 +40,15 @@ alt.themes.enable("bht_theme")
 # --------- Build a CSV link from your Sheet + tab name ----------
 def sheet_url_to_csv(url_or_id: str, tab_name: str) -> str:
     s = (url_or_id or "").strip()
-    # bare ID
     if re.fullmatch(r"[A-Za-z0-9-_]{30,}", s):
         return f"https://docs.google.com/spreadsheets/d/{s}/gviz/tq?tqx=out:csv&sheet={_url.quote(tab_name)}"
-    # full URL
     m = re.search(r"/spreadsheets/d/([A-Za-z0-9-_]+)", s)
     if m:
         sheet_id = m.group(1)
         return f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={_url.quote(tab_name)}"
-    # already a URL (maybe already CSV)
     return s
 
-DR_SHEET_TAB = "DR_Responses"  # exact tab name
+DR_SHEET_TAB = "DR_Responses"
 DR_EDIT_URL  = "https://docs.google.com/spreadsheets/d/1AMMfzbKreprRrhzJwMeQq9_2spdEvDLfGtEYnEMyF_8/edit?gid=0#gid=0"
 DR_CSV_SOURCE = sheet_url_to_csv(DR_EDIT_URL, DR_SHEET_TAB)
 st.caption(f"Using DR source: {DR_CSV_SOURCE}")
@@ -90,25 +61,19 @@ def load_csv_from_url(url: str, *, retries: int = 2, timeout: int = 30) -> pd.Da
         try:
             r = requests.get(url, timeout=timeout)
             r.raise_for_status()
-
-            raw = r.content.replace(b"\x00", b"")  # strip any NULs
+            raw = r.content.replace(b"\x00", b"")
             head = raw[:400].decode("utf-8", errors="replace").lower()
             if "<html" in head:
                 raise RuntimeError(
                     "Received HTML instead of CSV. Make the sheet public or Publish to web → CSV, "
                     "and use the CSV/export link."
                 )
-
             buf = io.BytesIO(raw)
             tries = [
-                dict(encoding="utf-8",     engine="python", sep=",", quotechar='"', doublequote=True,
-                     on_bad_lines="error", low_memory=False),
-                dict(encoding="utf-8",     engine="python", sep=",", quotechar='"', doublequote=True,
-                     on_bad_lines="skip",  low_memory=False),
-                dict(encoding="utf-8-sig", engine="python", sep=",", quoting=csv.QUOTE_NONE,
-                     escapechar="\\", on_bad_lines="skip", low_memory=False),
-                dict(encoding="latin-1",   engine="python", sep=",", quotechar='"', doublequote=True,
-                     on_bad_lines="skip",  low_memory=False),
+                dict(encoding="utf-8",     engine="python", sep=",", quotechar='"', doublequote=True, on_bad_lines="error", low_memory=False),
+                dict(encoding="utf-8",     engine="python", sep=",", quotechar='"', doublequote=True, on_bad_lines="skip",  low_memory=False),
+                dict(encoding="utf-8-sig", engine="python", sep=",", quoting=csv.QUOTE_NONE, escapechar="\\", on_bad_lines="skip", low_memory=False),
+                dict(encoding="latin-1",   engine="python", sep=",", quotechar='"', doublequote=True, on_bad_lines="skip",  low_memory=False),
             ]
             for opts in tries:
                 try:
@@ -118,8 +83,7 @@ def load_csv_from_url(url: str, *, retries: int = 2, timeout: int = 30) -> pd.Da
                     return df
                 except Exception:
                     pass
-
-            # Fallback: tolerant manual reader
+            # Fallback manual reader
             text = raw.decode("utf-8", errors="replace")
             lines = [ln for ln in text.splitlines() if ln.strip()]
             rows = [row for row in csv.reader(lines) if any(str(c).strip() for c in row)]
@@ -132,7 +96,6 @@ def load_csv_from_url(url: str, *, retries: int = 2, timeout: int = 30) -> pd.Da
             df = pd.DataFrame(data, columns=header)
             df.columns = [str(c).strip() for c in df.columns]
             return df
-
         except Exception as e:
             last_err = e
             if attempt < retries:
@@ -148,7 +111,7 @@ except Exception as e:
     st.error(f"Failed to load DR data:\n\n{e}")
     st.stop()
 
-# Drop duplicate-named columns, keep the first occurrence
+# Deduplicate duplicate-named columns
 if df.columns.duplicated().any():
     st.warning("Duplicate column names detected; keeping the first occurrence of each.")
     df = df.loc[:, ~df.columns.duplicated()]
@@ -171,29 +134,19 @@ if _dt_col:
     df["_dt"] = pd.to_datetime(df[_dt_col], errors="coerce")
 else:
     df["_dt"] = pd.NaT
+    
+df["_name"] = (df["StudentLast"].astype("string").str.strip() + ", " +
+               df["StudentFirst"].astype("string").str.strip())
 
-# --------- Sidebar filters (for Analytics & Top-2) ----------
+
+# --------- Sidebar filters (NO DATE FILTER) ----------
 with st.sidebar:
     st.header("🔎 Filters")
-
-    # Date range filter
-    if df["_dt"].notna().any():
-        min_dt = df["_dt"].min()
-        max_dt = df["_dt"].max()
-        dr = st.date_input(
-            "Date range",
-            value=(min_dt.date(), max_dt.date()),
-            min_value=min_dt.date(), max_value=max_dt.date()
-        )
-    else:
-        dr = None
-
     # Grade filter
     grade_sel = []
     if has_grade:
         grades = sorted([g for g in df["Grade"].dropna().unique()])
         grade_sel = st.multiselect("Grade", options=grades, default=[])
-
     # Staff filter
     _teacher_col  = next((c for c in ["TeacherName","Teacher","Staff","Referrer"] if c in df.columns), None)
     staff_sel = []
@@ -201,24 +154,28 @@ with st.sidebar:
         staff_opts = sorted([t for t in df[_teacher_col].astype("string").dropna().unique()])
         staff_sel = st.multiselect("Referrer", options=staff_opts, default=[])
 
-# Apply filters to an analytics copy
+# Apply filters to an analytics copy (no date filtering)
 fdf = df.copy()
-if dr and len(dr) == 2:
-    start, end = [pd.to_datetime(d) for d in dr]
-    mask_dt = fdf["_dt"].between(start, end + pd.Timedelta(days=1) - pd.Timedelta(microseconds=1), inclusive="both")
-    fdf = fdf[mask_dt]
 if has_grade and grade_sel:
     fdf = fdf[fdf["Grade"].isin(grade_sel)]
 if _teacher_col and staff_sel:
     fdf = fdf[fdf[_teacher_col].isin(staff_sel)]
 
 # --------- Helpers ----------
+def _col(df_in, candidates):
+    """Return the first existing column from a list of candidate names, else None."""
+    for c in candidates:
+        if c in df_in.columns:
+            return c
+    return None
+
+
 def _vc(df_in, col, top=15, split_multi=False):
     if col not in df_in.columns:
         return pd.DataFrame(columns=["value","n"])
     s = df_in[col].astype("string").str.strip()
     if split_multi:
-        s = s.str.replace(",", ";")  # normalize accidental commas
+        s = s.str.replace(",", ";")
         s = s.str.split(";").explode().astype("string").str.strip()
     s = s.replace("", pd.NA).dropna()
     if s.empty:
@@ -249,7 +206,7 @@ def _line_by_freq(s: pd.Series, freq_label: str, title_prefix="Referrals"):
     freq = freq_map.get(freq_label, "W")
     grp = s.groupby(s.dt.to_period(freq)).size().sort_index()
     grouped = grp.rename_axis("period").reset_index(name="n")
-    grouped["period"] = grouped["period"].dt.start_time  # vectorized
+    grouped["period"] = grouped["period"].dt.start_time
     if grouped.empty:
         return None
     title = f"{title_prefix} — {freq_label}"
@@ -328,7 +285,7 @@ def _render_top2(title: str, vc: pd.DataFrame, fallback_caption: str):
         count = int(rec["n"]) if pd.notna(rec["n"]) else 0
         cols[i].metric(label, count)
 
-# --------- Counts & flags (full dataset; independent of sidebar filters) ----------
+# --------- Counts & flags (full dataset; independent of filters) ----------
 threshold = st.number_input("Flag threshold (referrals ≥)", min_value=1, value=3, step=1, help="Flags are computed from the full dataset.")
 counts = (
     df.groupby(["StudentLast", "StudentFirst"], dropna=False)
@@ -360,28 +317,21 @@ summary["Name"] = summary["StudentLast"] + ", " + summary["StudentFirst"]
 summary = summary.sort_values(["ReferralCount", "Name"], ascending=[False, True])
 flagged = summary[summary["ReferralCount"] >= int(threshold)].copy()
 
-# --------- Column picks (reused) ----------
+# --------- Column picks ----------
 _behavior_col = next((c for c in ["IncidentType","MainConcern","Behavior","ProblemBehavior"] if c in df.columns), None)
 _teacher_col  = next((c for c in ["TeacherName","Teacher","Staff","Referrer"] if c in df.columns), None)
 _grade_col    = "Grade" if "Grade" in df.columns else None
 _interv_col   = next((c for c in ["ClassroomInterventions","Classroom Intervention","TeacherIntervention","Interventions"] if c in df.columns), None)
 _location_col = next((c for c in ["Location","Setting","BehaviorSubject"] if c in df.columns), None)
-
-_proactive_col = next((c for c in [
-    "ProactiveConcerns","Proactive Concern","ProactiveConcern","Proactive"
-] if c in df.columns), None)
-_minor_col = next((c for c in [
-    "MinorProblemBehavior","Minor Problem","MinorBehavior","Minor"
-] if c in df.columns), None)
-_major_col = next((c for c in [
-    "MajorProblemBehavior","Major Problem","MajorBehavior","Major"
-] if c in df.columns), None)
-_sel_col = next((c for c in [
-    "SELCompetency","SEL Competency","SEL Area","SEL Domain"
-] if c in df.columns), None)
+_proactive_col = next((c for c in ["ProactiveConcerns","Proactive Concern","ProactiveConcern","Proactive"] if c in df.columns), None)
+_minor_col = next((c for c in ["MinorProblemBehavior","Minor Problem","MinorBehavior","Minor"] if c in df.columns), None)
+_major_col = next((c for c in ["MajorProblemBehavior","Major Problem","MajorBehavior","Major"] if c in df.columns), None)
+_sel_col = next((c for c in ["SELCompetency","SEL Competency","SEL Area","SEL Domain"] if c in df.columns), None)
 
 # ============================== LAYOUT (tabs) ==============================
-tab_overview, tab_analytics, tab_flags, tab_raw = st.tabs(["Overview", "Analytics", "Flags", "Raw Data"])
+tab_overview, tab_analytics, tab_narrative, tab_flags, tab_raw = st.tabs(
+    ["Overview", "Analytics", "Narrative", "Flags", "Raw Data"]
+)
 
 with tab_overview:
     st.subheader("At a glance")
@@ -456,6 +406,127 @@ with tab_analytics:
         ch = _bar(vc, "Interventions used", "Intervention")
         if ch: st.altair_chart(ch, use_container_width=True)
         else:  st.caption("No interventions recorded.")
+        
+with tab_narrative:
+    st.subheader("🧾 Student Narrative")
+
+    # Column picks we’ll reuse
+    
+    # Prefer Homeroom Teacher; fall back to other likely columns
+    teacher_col = _col(df, [
+        "Homeroom Teacher", "HomeroomTeacher", "HRTeacher",
+        "Teacher/POC", "POC", "TeacherName", "Teacher", "Staff", "Referrer"
+    ])
+
+    main_col     = _col(df, ["IncidentType","MainConcern","Behavior","ProactiveConcern","ProblemBehavior"])
+    addl_col     = _col(df, ["AdditionalConcern","SecondaryConcern"])
+    location_col = _col(df, ["Location","Setting","BehaviorSubject"])
+    # Observation / free text possibilities
+    note_col     = _col(df, ["Observation","Notes","Description","Narrative","Details"])
+    # Interventions (single combined) or tiered
+    interv_col   = _col(df, ["ClassroomInterventions","TeacherIntervention","Interventions"])
+    tier1_col    = _col(df, ["TierOne","Tier 1","Tier I"])
+    tier2_col    = _col(df, ["TierTwo","Tier 2","Tier II"])
+    tier3_col    = _col(df, ["TierThree","Tier 3","Tier III"])
+
+    # Student picker
+    student_list = sorted([n for n in df["_name"].dropna().unique() if n and n != ", "])
+    if not student_list:
+        st.info("No student names found.")
+        st.stop()
+
+    student = st.selectbox("Choose a student", student_list, index=0, key="narr_student")
+
+    # Filter to that student & sort by datetime if present
+    sdf = df[df["_name"] == student].copy()
+    sdf = sdf.sort_values("_dt") if "_dt" in sdf.columns else sdf
+
+    # Quick search within this student's entries
+    q = st.text_input("Search this student's entries (optional)")
+    if q:
+        qlow = q.lower()
+        # Build a combined text column to search
+        search_cols = [c for c in [note_col, main_col, addl_col, location_col, teacher_col, interv_col,
+                                   tier1_col, tier2_col, tier3_col] if c]
+        if search_cols:
+            sdf = sdf[sdf[search_cols].astype(str).apply(lambda row: qlow in (" | ".join(row)).lower(), axis=1)]
+
+    if sdf.empty:
+        st.caption("No matching entries for this student.")
+        st.stop()
+
+    # Render as a simple timeline
+    st.markdown(f"**Entries for:** {student}  &nbsp;&nbsp; _(total {len(sdf)})_")
+    st.divider()
+
+    parts = []
+    for _, r in sdf.iterrows():
+        dt_str = ""
+        if "_dt" in r and pd.notna(r["_dt"]):
+            try:
+                dt_str = pd.to_datetime(r["_dt"]).strftime("%Y-%m-%d %H:%M")
+            except Exception:
+                dt_str = str(r.get("_dt", "")) or ""
+
+        # Collect fields for display
+        teacher = str(r.get(teacher_col, "")) if teacher_col else ""
+        main    = str(r.get(main_col, "")) if main_col else ""
+        addl    = str(r.get(addl_col, "")) if addl_col else ""
+        loc     = str(r.get(location_col, "")) if location_col else ""
+        note    = str(r.get(note_col, "")) if note_col else ""
+
+        # Interventions summary (prefer combined; else join tiers)
+        interv = ""
+        if interv_col:
+            interv = str(r.get(interv_col, "")) or ""
+        else:
+            tiers = [str(r.get(tier1_col,"") or ""), str(r.get(tier2_col,"") or ""), str(r.get(tier3_col,"") or "")]
+            tiers = [t for t in tiers if t]
+            interv = "; ".join(tiers)
+
+        # Pretty card
+        st.markdown(
+            f"""
+<div style="border-left:4px solid #e5e7eb; padding:8px 12px; margin:8px 0;">
+  <div style="font-weight:600;">{dt_str or "—"}</div>
+    <div style="color:#4b5563; margin-top:2px;">
+      <b>Homeroom teacher:</b> {teacher or "—"} &nbsp;&nbsp;
+      <b>Location:</b> {loc or "—"}
+    </div>
+
+  <div style="margin-top:6px;">
+    <b>Main concern:</b> {main or "—"}<br/>
+    {"<b>Additional:</b> " + addl if addl else ""}
+  </div>
+  <div style="margin-top:6px;">
+    <b>Interventions:</b> {interv or "—"}
+  </div>
+  {"<div style='margin-top:6px; white-space:pre-wrap;'><b>Observation:</b> " + (note or "—") + "</div>" if note_col else ""}
+</div>
+""",
+            unsafe_allow_html=True
+        )
+
+        # For downloadable narrative text
+        line = []
+        if dt_str: line.append(f"[{dt_str}]")
+        if teacher: line.append(f"Staff: {teacher}")
+        if loc: line.append(f"Location: {loc}")
+        if main: line.append(f"Main: {main}")
+        if addl: line.append(f"Additional: {addl}")
+        if interv: line.append(f"Interventions: {interv}")
+        if note: line.append(f"Observation: {note}")
+        parts.append(" | ".join(line))
+
+    # Download compiled narrative
+    compiled = ("\n".join(parts)).encode("utf-8")
+    st.download_button(
+        "Download narrative (.txt)",
+        data=compiled,
+        file_name=f"{student.replace(',','').replace(' ','_')}_narrative.txt",
+        mime="text/plain"
+    )
+
 
 with tab_flags:
     st.subheader("🚩 Students flagged")
@@ -481,5 +552,5 @@ with tab_flags:
 
 with tab_raw:
     st.subheader("Raw DR data (filtered view)")
-    st.caption("This table reflects the sidebar filters.")
+    st.caption("This table reflects the sidebar filters (Grade / Referrer).")
     st.dataframe(fdf, use_container_width=True, hide_index=True)

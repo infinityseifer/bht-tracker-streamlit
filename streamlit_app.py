@@ -5,6 +5,17 @@ import pandas as pd
 import streamlit as st
 import altair as alt
 
+# near your imports
+try:
+    SECRETS = dict(st.secrets)
+except Exception:
+    SECRETS = {}
+
+# then use SECRETS.get(...) instead of st.secrets.get(...)
+form_dr  = SECRETS.get("form_dr_url",  "https://script.google.com/macros/s/AKfycbxUBFzrOUlgYlwqeVqnTzT072rNFxfsKCJQBZZ7xb8IxRLATl8KyPcIgRlkEVviWawp/exec")
+form_bht = SECRETS.get("form_bht_url", "https://script.google.com/macros/s/AKfycbxcQWju7zho6BOb710bIKqxsD_1tZ7mnFvRJ-YLLrSkGzaD54WbbZgCsnoEzQ-8dMKE/exec")
+
+
 st.set_page_config(page_title="BHT Tracker Home", layout="wide")
 
 # --- BIG buttons ---
@@ -31,8 +42,13 @@ window.addEventListener('load', () => {
 st.title("🏫 BHT Tracker")
 
 # === 1) Links to Google Apps Script forms ===
+<<<<<<< HEAD
 form_dr  = st.secrets.get("form_dr_url",  "https://script.google.com/macros/s/AKfycbxUBFzrOUlgYlwqeVqnTzT072rNFxfsKCJQBZZ7xb8IxRLATl8KyPcIgRlkEVviWawp/exec")
 form_bht = st.secrets.get("form_bht_url", "https://script.google.com/macros/s/AKfycbxcQWju7zho6BOb710bIKqxsD_1tZ7mnFvRJ-YLLrSkGzaD54WbbZgCsnoEzQ-8dMKE/exec")
+=======
+# form_dr  = st.secrets.get("form_dr_url",  "https://script.google.com/macros/s/AKfycbxUBFzrOUlgYlwqeVqnTzT072rNFxfsKCJQBZZ7xb8IxRLATl8KyPcIgRlkEVviWawp/exec")
+# form_bht = st.secrets.get("form_bht_url", "https://script.google.com/macros/s/AKfycbxcQWju7zho6BOb710bIKqxsD_1tZ7mnFvRJ-YLLrSkGzaD54WbbZgCsnoEzQ-8dMKE/exec")
+>>>>>>> 448b66dc94e5d882fb1ca5ae1d07e2b6869857c8
 
 col1, col2 = st.columns(2)
 with col1:
