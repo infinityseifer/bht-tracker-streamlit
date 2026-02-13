@@ -145,6 +145,17 @@
         <option>Small Group Work</option><option>Large Group Work</option>
         <option>Transitioning</option><option>Dismissal</option>
       </select>
+
+      <label>Next steps to support student</label>
+      <textarea name="NextSteps" id="NextSteps" maxlength="3000"
+                placeholder="Describe the next steps, who will do them, and timeline." required></textarea>
+      <small id="NextStepsCounter">0 / 3000</small>
+
+      <label>Receipt recipients (optional)</label>
+      <input name="ReceiptEmails" id="ReceiptEmails" type="text"
+            placeholder="Additional emails (comma-separated) e.g., teacher2@cps.edu, dean@cps.edu" />
+      <span class="muted">Teacher/POC Email will always receive the receipt. Add anyone else here.</span>
+
     </form>
 
     <button id="previewBtn">Preview Before Submit</button>
@@ -164,6 +175,14 @@
       const c  = document.getElementById('ObservationCounter');
       if (el && c) el.addEventListener('input', () => c.textContent = `${el.value.length} / 5000`);
     })();
+
+    // NextSteps counter
+    (() => {
+      const el = document.getElementById('NextSteps');
+      const c  = document.getElementById('NextStepsCounter');
+      if (el && c) el.addEventListener('input', () => c.textContent = `${el.value.length} / 3000`);
+    })();
+
 
     // Build Choices multi-selects with options
     const choices = {};
